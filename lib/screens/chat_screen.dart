@@ -1,3 +1,4 @@
+import 'package:flash_chat_new/models/message_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flash_chat_new/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -72,6 +73,7 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
       body: SafeArea(
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
@@ -79,12 +81,27 @@ class _ChatScreenState extends State<ChatScreen> {
               stream: FirebaseFirestore.instance.collection('messages').snapshots(),
               builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (snapshot.hasData) {
-                  snapshot.data?.docs.map((DocumentSnapshot document) {
-                    Map<String, dynamic> data = document.data() as Map<String, dynamic>;
-                    final messageText = data['text'];
-                    final messageSender = data['sender'];
-                    return Column(children: [Text('$messageText')]);
-                  });
+                  final messages = snapshot.data?.docs;
+                  List<MessageModel> messageModel = [];
+                  if (messages != null)
+                    for (var message in messages) {
+                      messageModel.add(
+                        MessageModel(
+                          message: message['text'],
+                          sender: message['sender'],
+                        ),
+                      );
+                    }
+                  return Expanded(
+                    child: ListView.builder(
+                      itemBuilder: (context, index) {
+                        return Text(
+                          messageModel[index].message.toString(),
+                        );
+                      },
+                      itemCount: messageModel.length,
+                    ),
+                  );
                 } else {
                   return Column(children: [Text('no data')]);
                 }
