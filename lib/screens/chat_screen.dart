@@ -78,8 +78,10 @@ class _ChatScreenState extends State<ChatScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance.collection('messages').snapshots(),
-              builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+              stream:
+                  FirebaseFirestore.instance.collection('messages').snapshots(),
+              builder: (BuildContext context,
+                  AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (snapshot.hasData) {
                   final messages = snapshot.data?.docs;
                   List<MessageModel> messageModel = [];
@@ -95,8 +97,28 @@ class _ChatScreenState extends State<ChatScreen> {
                   return Expanded(
                     child: ListView.builder(
                       itemBuilder: (context, index) {
-                        return Text(
-                          messageModel[index].message.toString(),
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              margin: EdgeInsets.fromLTRB(10.0, 0, 0, 0),
+                              child: Text('${messageModel[index].sender.toString()}',
+                                  style: TextStyle(color: Colors.black26)),
+                            ),
+                            Container(
+                              margin: EdgeInsets.fromLTRB(10.0, 0, 10.0, 10.0),
+                              padding: EdgeInsets.all(10.0),
+                              // color: Colors.blue,
+                              decoration: BoxDecoration(
+                                color: Colors.green[200],
+
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(15))),
+                              child: Text(
+                                '${messageModel[index].message.toString()}',
+                              ),
+                            ),
+                          ],
                         );
                       },
                       itemCount: messageModel.length,
