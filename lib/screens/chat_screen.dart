@@ -22,7 +22,7 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     super.initState();
     getCurrentUser();
-    messageStream();
+    //messageStream();
   }
 
   void getCurrentUser() {
@@ -44,13 +44,13 @@ class _ChatScreenState extends State<ChatScreen> {
   //   }
   // }
 
-  void messageStream() async {
-    await for (var snapshot in _firestore.collection('messages').snapshots()) {
-      for (var message in snapshdocs) {
-        print(message.data());
-      }
-    }
-  }
+  // void messageStream() async {
+  //   await for (var snapshot in _firestore.collection('messages').snapshots()) {
+  //     for (var message in snapshot) {
+  //       print(message.data());
+  //     }
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +61,7 @@ class _ChatScreenState extends State<ChatScreen> {
           IconButton(
               icon: Icon(Icons.close),
               onPressed: () {
-                messageStream();
+                // messageStream();
                 // await FirebaseAuth.instance.signOut();
                 // Navigator.pushNamed(context, LoginScreen.id);
                 //Implement logout functionality
@@ -76,26 +76,21 @@ class _ChatScreenState extends State<ChatScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('messages')
-                    .snapshots(),
-                builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                 if (snapshot.hasData) {
-                  snapshot.data.docs.map((DocumentSnapshot document) {
-                      Map<String, dynamic> data =
-                          document.data() as Map<String, dynamic>;
-                      final messageText = data['text'];
-                      final messageSender = data['sender'];
-                      return Column(
-                          children: [Text('$messageText')]);
-                    });
-
-                  } else {
-                   return Column(
-                       children: [Text('no data')]);
-                 }
- return Container();
-                },),
+              stream: FirebaseFirestore.instance.collection('messages').snapshots(),
+              builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (snapshot.hasData) {
+                  snapshot.data?.docs.map((DocumentSnapshot document) {
+                    Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+                    final messageText = data['text'];
+                    final messageSender = data['sender'];
+                    return Column(children: [Text('$messageText')]);
+                  });
+                } else {
+                  return Column(children: [Text('no data')]);
+                }
+                return Container();
+              },
+            ),
             Container(
               decoration: kMessageContainerDecoration,
               child: Row(
