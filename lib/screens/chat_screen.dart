@@ -84,48 +84,28 @@ class _ChatScreenState extends State<ChatScreen> {
                   AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (snapshot.hasData) {
                   final messages = snapshot.data?.docs;
-                  List<MessageModel> messageModel = [];
+                  List<MessageBubble> messageBubbles = [];
                   if (messages != null)
                     for (var message in messages) {
-                      messageModel.add(
-                        MessageModel(
-                          message: message['text'],
-                          sender: message['sender'],
-                        ),
+                      final messageText = message['text'];
+                      final messageSender = message['sender'];
+                      final messageBubble = MessageBubble(
+                        sender: messageSender,
+                        message: messageText,
                       );
+                      messageBubbles.add(messageBubble);
                     }
                   return Expanded(
-                    child: ListView.builder(
-                      itemBuilder: (context, index) {
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              margin: EdgeInsets.fromLTRB(10.0, 0, 0, 0),
-                              child: Text('${messageModel[index].sender.toString()}',
-                                  style: TextStyle(color: Colors.black26)),
-                            ),
-                            Container(
-                              margin: EdgeInsets.fromLTRB(10.0, 0, 10.0, 10.0),
-                              padding: EdgeInsets.all(10.0),
-                              // color: Colors.blue,
-                              decoration: BoxDecoration(
-                                color: Colors.green[200],
-
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(15))),
-                              child: Text(
-                                '${messageModel[index].message.toString()}',
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                      itemCount: messageModel.length,
+                    child: ListView(
+                      children: messageBubbles,
                     ),
                   );
                 } else {
-                  return Column(children: [Text('no data')]);
+                  return Center(
+                    child: CircularProgressIndicator(
+                      backgroundColor: Colors.lightBlueAccent,
+                    ),
+                  );
                 }
                 return Container();
               },
@@ -162,6 +142,45 @@ class _ChatScreenState extends State<ChatScreen> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class MessageBubble extends StatelessWidget {
+  final String? sender;
+  final String? message;
+
+  MessageBubble({this.sender, this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Container(
+          margin: EdgeInsets.fromLTRB(10.0, 0, 10, 0),
+          child: Text('$sender', style: TextStyle(color: Colors.black38)),
+        ),
+        Container(
+          margin: EdgeInsets.fromLTRB(10.0, 0, 10.0, 10.0),
+          padding: EdgeInsets.all(10.0),
+          decoration: BoxDecoration(
+              color: Colors.lightBlueAccent,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  spreadRadius: 1,
+                  blurRadius: 2,
+                  //offset: Offset(0, 3),
+                )
+              ],
+              borderRadius: BorderRadius.all(Radius.circular(30))),
+          child: Text(
+            '$message',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+      ],
     );
   }
 }
